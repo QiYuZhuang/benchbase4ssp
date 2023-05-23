@@ -82,6 +82,10 @@ public final class SQLStmt {
         return (this.sql);
     }
 
+    public final void combineSQL(SQLStmt other) {
+        sql = orig_sql + ";" + other.getOriginalSQL();
+    }
+
     protected final String getOriginalSQL() {
         return (this.orig_sql);
     }

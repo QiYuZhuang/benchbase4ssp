@@ -46,6 +46,8 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
 
     private final char[] data;
     private final String[] params = new String[YCSBConstants.NUM_FIELDS];
+
+    private final String[][] fixParams = new String[10][YCSBConstants.NUM_FIELDS];
     private final String[] results = new String[YCSBConstants.NUM_FIELDS];
 
     private final UpdateRecord procUpdateRecord;
@@ -55,11 +57,25 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
     private final InsertRecord procInsertRecord;
     private final DeleteRecord procDeleteRecord;
 
+    private final ReadWriteRecord procReadWriteRecord;
+
+    private final int totalRequest = 5; // totalRequest < 10
+    private final double ratio1 = 1.0;
+    private final double ratio2 = 0.5;
+
     public YCSBWorker(YCSBBenchmark benchmarkModule, int id, int init_record_count) {
         super(benchmarkModule, id);
         this.data = new char[benchmarkModule.fieldSize];
         this.readRecord = new ZipfianGenerator(rng(), init_record_count);// pool for read keys
         this.randScan = new ZipfianGenerator(rng(), YCSBConstants.MAX_SCAN);
+        for (int i = 0; i < totalRequest; i++) {
+            for (int j = 0; j < this.params.length; j++) {
+                this.fixParams[i][j] = new String(TextGenerator.randomFastChars(rng(), this.data));
+                this.fixParams[i][j] = this.fixParams[i][j].replaceAll(";", "!");
+                this.fixParams[i][j] = this.fixParams[i][j].replaceAll("\"", ".");
+                this.fixParams[i][j] = this.fixParams[i][j].replaceAll("'", "~");
+            }
+        }
 
         synchronized (YCSBWorker.class) {
             // We must know where to start inserting
@@ -69,7 +85,7 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
         }
 
         // This is a minor speed-up to avoid having to invoke the hashmap look-up
-        // everytime we want to execute a txn. This is important to do on 
+        // everytime we want to execute a txn. This is important to do on
         // a client machine with not a lot of cores
         this.procUpdateRecord = this.getProcedure(UpdateRecord.class);
         this.procScanRecord = this.getProcedure(ScanRecord.class);
@@ -77,6 +93,7 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
         this.procReadModifyWriteRecord = this.getProcedure(ReadModifyWriteRecord.class);
         this.procInsertRecord = this.getProcedure(InsertRecord.class);
         this.procDeleteRecord = this.getProcedure(DeleteRecord.class);
+        this.procReadWriteRecord = this.getProcedure(ReadWriteRecord.class);
     }
 
     @Override
@@ -95,6 +112,8 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
             scanRecord(conn);
         } else if (procClass.equals(UpdateRecord.class)) {
             updateRecord(conn);
+        } else if (procClass.equals(ReadWriteRecord.class)) {
+            readWriteRecord(conn);
         }
         return (TransactionStatus.SUCCESS);
     }
@@ -139,9 +158,36 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
         this.procDeleteRecord.run(conn, keyname);
     }
 
+    private void readWriteRecord(Connection conn) throws SQLException {
+        int[] keyNames = new int[totalRequest];
+        boolean flag;
+        for (int i = 0; i < totalRequest; i++) {
+            while (true) {
+                int keyname = readRecord.nextInt();
+                flag = false;
+                for (int j = 0; j < i; j++) {
+                    if (keyname == keyNames[j]) {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (!flag) {
+                    keyNames[i] = keyname;
+                    break;
+                }
+            }
+        }
+
+        this.procReadWriteRecord.run(conn, keyNames, fixParams, ratio1, ratio2);
+    }
+
     private void buildParameters() {
         for (int i = 0; i < this.params.length; i++) {
             this.params[i] = new String(TextGenerator.randomFastChars(rng(), this.data));
+            this.params[i] = this.params[i].replaceAll(";", "!");
+            this.params[i] = this.params[i].replaceAll("\"", ".");
+            this.params[i] = this.params[i].replaceAll("'", "~");
         }
     }
 }

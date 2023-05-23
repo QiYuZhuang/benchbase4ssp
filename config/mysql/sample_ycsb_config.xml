@@ -4,22 +4,24 @@
     <!-- Connection details -->
     <type>MYSQL</type>
     <driver>com.mysql.cj.jdbc.Driver</driver>
-    <url>jdbc:mysql://localhost:3306/benchbase?rewriteBatchedStatements=true&amp;allowPublicKeyRetrieval=True&amp;sslMode=DISABLED</url>
-    <username>admin</username>
-    <password>password</password>
+    <url>jdbc:mysql://10.77.110.145:3307/sharding_db?rewriteBatchedStatements=true&amp;allowPublicKeyRetrieval=True&amp;sslMode=DISABLED&amp;allowMultiQueries=true&amp;pinGlobalTxToPhysicalConnection=true&amp;useLocalSessionState=true</url>
+    <username>sharding</username>
+    <password>sharding</password>
     <isolation>TRANSACTION_SERIALIZABLE</isolation>
     <batchsize>128</batchsize>
 
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
-    <scalefactor>1</scalefactor>
+    <scalefactor>100</scalefactor>
 
     <!-- The workload -->
-    <terminals>1</terminals>
+    <terminals>10</terminals>
     <works>
         <work>
-            <time>60</time>
+            <time>6000</time>
             <rate>10000</rate>
-            <weights>50,5,15,10,10,10</weights>
+<!--            <weights>50,0,0,50,0,0,0</weights>-->
+            <weights>0,0,0,0,0,0,100</weights>
+<!--            <weights>100,0,0,0,0,0,0</weights>-->
         </work>
     </works>
 
@@ -42,6 +44,9 @@
         </transactiontype>
         <transactiontype>
             <name>ReadModifyWriteRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>ReadWriteRecord</name>
         </transactiontype>
     </transactiontypes>
 </parameters>

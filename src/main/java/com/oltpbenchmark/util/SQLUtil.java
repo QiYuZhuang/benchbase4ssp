@@ -483,6 +483,7 @@ WHERE t.name='%s' AND c.name='%s'
             case NOISEPAGE: // fall-through
             case SQLITE:
             case HSQLDB:
+            case MYSQL:
                 return getCatalogHSQLDB(benchmarkModule);
             default:
                 return getCatalogDirect(databaseType, connection);
