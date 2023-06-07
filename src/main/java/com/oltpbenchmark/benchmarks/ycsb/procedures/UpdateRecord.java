@@ -19,10 +19,9 @@ package com.oltpbenchmark.benchmarks.ycsb.procedures;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
+import com.oltpbenchmark.benchmarks.ycsb.YCSBConstants;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 import static com.oltpbenchmark.benchmarks.ycsb.YCSBConstants.TABLE_NAME;
 
@@ -34,13 +33,21 @@ public class UpdateRecord extends Procedure {
     );
 
     public void run(Connection conn, int keyname, String[] vals) throws SQLException {
-        try (PreparedStatement stmt = this.getPreparedStatement(conn, updateAllStmt)) {
+        StringBuilder final_stmt = new StringBuilder();
+        String updateFormat = "UPDATE " + TABLE_NAME + " SET FIELD1=\"%s\",FIELD2=\"%s\",FIELD3=\"%s\",FIELD4=\"%s\",FIELD5=\"%s\"," +
+            "FIELD6=\"%s\",FIELD7=\"%s\",FIELD8=\"%s\",FIELD9=\"%s\",FIELD10=\"%s\" WHERE YCSB_KEY=%d";
+        final_stmt.append(updateFormat.formatted(vals[0], vals[1],
+            vals[2], vals[3],
+            vals[4], vals[5],
+            vals[6], vals[7],
+            vals[8], vals[9],
+            keyname));
 
-            stmt.setInt(11, keyname);
-            for (int i = 0; i < vals.length; i++) {
-                stmt.setString(i + 1, vals[i]);
-            }
-            stmt.executeUpdate();
+        Statement stmt = conn.createStatement();
+        try {
+            stmt.execute(final_stmt.toString());
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
         }
     }
 }
