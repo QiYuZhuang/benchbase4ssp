@@ -36,7 +36,6 @@ public class ReadRecord extends Procedure {
         String readFormat = "SELECT * FROM " + TABLE_NAME + " WHERE YCSB_KEY=%d";
         final_stmt.append(readFormat.formatted(keyname));
 
-
         Statement stmt = conn.createStatement();
         try {
             boolean rs = stmt.execute(final_stmt.toString());
@@ -49,8 +48,16 @@ public class ReadRecord extends Procedure {
                     }
                 }
             }
+            Thread.sleep(0);
+//            System.out.println("sql: " + final_stmt);
         } catch (SQLException ex) {
-            System.out.println(ex.toString());
+            System.out.println("error sql: " + final_stmt);
+//            System.out.println(ex.toString());
+            throw ex;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            stmt.close();
         }
     }
 

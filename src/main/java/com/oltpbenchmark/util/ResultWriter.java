@@ -49,7 +49,13 @@ public class ResultWriter {
     private static final String[] BENCHMARK_KEY_FIELD = {
             "isolation",
             "scalefactor",
-            "terminals"
+            "terminals",
+            "zipf",
+            "wrtuple",
+            "wrtxn",
+            "disRatio",
+            "rate",
+            "weights"
     };
 
     private final XMLConfiguration expConf;

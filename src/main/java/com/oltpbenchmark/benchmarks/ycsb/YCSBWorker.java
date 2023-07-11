@@ -60,13 +60,22 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
     private final ReadWriteRecord procReadWriteRecord;
 
     private final int totalRequest = 5; // totalRequest < 10
-    private final double ratio1 = 1.0;
-    private final double ratio2 = 0.5;
+    private final double ratio1;
+    private final double ratio2;
+    private final double disRatio;
+    private final int nodeCnt;
 
-    public YCSBWorker(YCSBBenchmark benchmarkModule, int id, int init_record_count) {
+    private final int[] keys;
+
+    public YCSBWorker(YCSBBenchmark benchmarkModule, int id, int init_record_count, double zipf, int[] keys, double ratio1, double ratio2, double disRatio, int nodeCnt) {
         super(benchmarkModule, id);
         this.data = new char[benchmarkModule.fieldSize];
-        this.readRecord = new ZipfianGenerator(rng(), init_record_count);// pool for read keys
+        this.ratio1 = ratio1;
+        this.ratio2 = ratio2;
+        this.disRatio = disRatio;
+        this.nodeCnt = nodeCnt;
+        // TODO:
+        this.readRecord = new ZipfianGenerator(rng(), init_record_count, zipf);// pool for read keys
         this.randScan = new ZipfianGenerator(rng(), YCSBConstants.MAX_SCAN);
         for (int i = 0; i < totalRequest; i++) {
             for (int j = 0; j < this.params.length; j++) {
@@ -76,6 +85,8 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
                 this.fixParams[i][j] = this.fixParams[i][j].replaceAll("'", "~");
             }
         }
+
+        this.keys = keys;
 
         synchronized (YCSBWorker.class) {
             // We must know where to start inserting
@@ -120,9 +131,26 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
 
     private void updateRecord(Connection conn) throws SQLException {
 
-        int keyname = readRecord.nextInt();
+        int keyname = chooseUsefulKey(readRecord.nextInt());
         this.buildParameters();
         this.procUpdateRecord.run(conn, keyname, this.params);
+    }
+
+    private int chooseUsefulKey(int key) {
+        if (key % 2 == 1) {
+            key = key - 1;
+        }
+        if (keys[key] > 0) {
+            return key;
+        } else {
+            for (int j = key; j >= 0; j -= 2) {
+                if (keys[j] > 0) {
+                    return j;
+                }
+            }
+
+            return 0;
+        }
     }
 
     private void scanRecord(Connection conn) throws SQLException {
@@ -134,7 +162,7 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
 
     private void readRecord(Connection conn) throws SQLException {
 
-        int keyname = readRecord.nextInt();
+        int keyname = chooseUsefulKey(readRecord.nextInt());
         this.procReadRecord.run(conn, keyname, this.results);
     }
 
@@ -161,25 +189,47 @@ class YCSBWorker extends Worker<YCSBBenchmark> {
     private void readWriteRecord(Connection conn) throws SQLException {
         int[] keyNames = new int[totalRequest];
         boolean flag;
+        boolean is_distribute = Math.random() < disRatio;
+        boolean is_new_node;
+        int node_number = 0;
         for (int i = 0; i < totalRequest; i++) {
             while (true) {
                 int keyname = readRecord.nextInt();
                 flag = false;
+                is_new_node = true;
                 for (int j = 0; j < i; j++) {
                     if (keyname == keyNames[j]) {
                         flag = true;
                         break;
                     }
+                    if (keyname % nodeCnt != keyNames[j]) {
+                        is_new_node = false;
+                    }
+                }
+
+                // if new node
+                if (i > 0) {
+                    if (is_distribute && node_number <= 1) {
+                        if (!is_new_node)
+                            continue;
+                    }
                 }
 
                 if (!flag) {
                     keyNames[i] = keyname;
+                    if (is_new_node)
+                        node_number++;
+                    keys[keyname]++;
                     break;
                 }
             }
         }
 
         this.procReadWriteRecord.run(conn, keyNames, fixParams, ratio1, ratio2);
+
+        for (int i = 0; i < totalRequest; i++) {
+            keys[keyNames[i]]--;
+        }
     }
 
     private void buildParameters() {

@@ -66,15 +66,16 @@ public class YCSBBenchmark extends BenchmarkModule {
             String userCount = SQLUtil.getMaxColSQL(this.workConf.getDatabaseType(), t, "ycsb_key");
 
             try (Connection metaConn = this.makeConnection();
-                 Statement stmt = metaConn.createStatement();
-                 ResultSet res = stmt.executeQuery(userCount)) {
+                Statement stmt = metaConn.createStatement();
+                ResultSet res = stmt.executeQuery(userCount)) {
                 int init_record_count = 0;
                 while (res.next()) {
                     init_record_count = res.getInt(1);
                 }
+                int[] keys = new int[init_record_count + 2];
 
                 for (int i = 0; i < workConf.getTerminals(); ++i) {
-                    workers.add(new YCSBWorker(this, i, init_record_count + 1));
+                    workers.add(new YCSBWorker(this, i, init_record_count + 1, workConf.getZipfain(), keys, workConf.getWrTxn(), workConf.getWrTup(), workConf.getDisRatio(), workConf.getNodeCnt()));
                 }
             }
         } catch (SQLException e) {

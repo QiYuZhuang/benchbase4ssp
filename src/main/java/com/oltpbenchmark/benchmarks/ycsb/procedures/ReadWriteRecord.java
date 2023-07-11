@@ -62,9 +62,14 @@ public class ReadWriteRecord extends Procedure {
         Statement stmt = conn.createStatement();
         try {
             Boolean rs = stmt.execute(final_stmt.toString());
+            if (rs) {
+                stmt.getResultSet().close();
+            }
         } catch (SQLException ex) {
-//            System.out.println(ex.toString());
+            System.out.println(ex.toString());
             throw ex;
+        } finally {
+            stmt.close();
         }
 
         // maybe use ops when searching result

@@ -49,12 +49,57 @@ public class WorkloadConfiguration {
     private int isolationMode = Connection.TRANSACTION_SERIALIZABLE;
     private String dataDir = null;
     private String ddlPath = null;
+    private double zipfain = 0.6;
+    private double wrTxn = 0.5;
+    private double wrTup = 0.5;
+    private double disRatio = 0.5;
+    private int nodeCnt = 2;
 
     /**
      * If true, establish a new connection for each transaction, otherwise use one persistent connection per client
      * session. This is useful to measure the connection overhead.
      */
     private boolean newConnectionPerTxn = false;
+
+    public double getDisRatio() {
+        return disRatio;
+    }
+
+    public void setDisRatio(double disRatio) {
+        this.disRatio = disRatio;
+    }
+
+    public double getWrTxn() {
+        return wrTxn;
+    }
+
+    public void setWrTxn(double wrTxn) {
+        this.wrTxn = wrTxn;
+    }
+
+    public double getWrTup() {
+        return wrTup;
+    }
+
+    public void setWrTup(double wrTup) {
+        this.wrTup = wrTup;
+    }
+
+    public double getZipfain() {
+        return zipfain;
+    }
+
+    public void setZipfain(double zipf) {
+        zipfain = zipf;
+    }
+
+    public int getNodeCnt() {
+        return nodeCnt;
+    }
+
+    public void setNodeCnt(int nodeCnt) {
+        this.nodeCnt = nodeCnt;
+    }
 
     public String getBenchmarkName() {
         return benchmarkName;

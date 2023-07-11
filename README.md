@@ -38,6 +38,7 @@ Inside this folder, you can run BenchBase. For example, to execute the `tpcc` be
 
 ```bash
 java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true --load=true --execute=true
+java -jar benchbase.jar -b ycsb -c config/mysql/sample_ycsb_config.xml --execute=true
 ```
 
 A full list of options can be displayed,

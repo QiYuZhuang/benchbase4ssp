@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<parameters>
+	<type>MYSQL</type>
+	<driver>com.mysql.cj.jdbc.Driver</driver>
+	<url>jdbc:mysql://9.134.213.233:3307/sharding_db?rewriteBatchedStatements=true&amp;allowPublicKeyRetrieval=True&amp;sslMode=DISABLED&amp;allowMultiQueries=true&amp;pinGlobalTxToPhysicalConnection=true&amp;useLocalSessionState=true</url>
+	<username>sharding</username>
+	<password>sharding</password>
+	<isolation>TRANSACTION_SERIALIZABLE</isolation>
+	<batchsize>128</batchsize>
+	<zipf>0.8</zipf>
+	<wrtuple>0.5</wrtuple>
+	<wrtxn>0.5</wrtxn>
+	<scalefactor>100</scalefactor>
+	<terminals>128</terminals>
+	<works>
+		<work>
+			<warmup>10</warmup>
+			<time>50</time>
+			<rate>unlimited</rate>
+			<retries>1</retries>
+			<weights>40, 0, 0, 40, 0, 0, 20</weights>
+		</work>
+	</works>
+	<transactiontypes>
+		<transactiontype>
+			<name>ReadRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>InsertRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>ScanRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>UpdateRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>DeleteRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>ReadModifyWriteRecord</name>
+		</transactiontype>
+		<transactiontype>
+			<name>ReadWriteRecord</name>
+		</transactiontype>
+	</transactiontypes>
+</parameters>

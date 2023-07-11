@@ -9,6 +9,8 @@
     <password>sharding</password>
     <isolation>TRANSACTION_SERIALIZABLE</isolation>
     <batchsize>128</batchsize>
+    <zipf>0.6</zipf>
+    <nodeCnt>4</nodeCnt>
 
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
     <scalefactor>100</scalefactor>
@@ -17,12 +19,47 @@
     <terminals>32</terminals>
     <works>
         <work>
-            <time>30</time>
-            <rate>10000</rate>
-            <weights>50,0,0,50,0,0,0</weights>
-<!--            <weights>0,0,0,0,0,0,100</weights>-->
-<!--            <weights>100,0,0,0,0,0,0</weights>-->
+            <warmup>10</warmup>
+            <time>50</time>
+            <rate>2000</rate>
+            <retries>1</retries>
+            <!-- <weights>50,0,0,50,0,0,0</weights> -->
+            <!-- <weights>0,0,0,100,0,0,0</weights> -->
+            <!-- <weights>40,0,0,40,0,0,20</weights> -->
+            <weights>40,0,0,40,0,0,20</weights>
+            <!-- <weights>0,0,0,0,0,0,100</weights> -->
+            <!-- <weights>100,0,0,0,0,0,0</weights>-->
         </work>
+<!--        <work>-->
+<!--            <warmup>10</warmup>-->
+<!--            <time>50</time>-->
+<!--            <rate>75</rate>-->
+<!--            <weights>0,0,0,100,0,0,0</weights>-->
+<!--        </work>-->
+<!--        <work>-->
+<!--            <warmup>10</warmup>-->
+<!--            <time>250</time>-->
+<!--            <rate>100</rate>-->
+<!--            <weights>0,0,0,100,0,0,0</weights>-->
+<!--        </work>-->
+<!--        <work>-->
+<!--            <warmup>10</warmup>-->
+<!--            <time>250</time>-->
+<!--            <rate>85</rate>-->
+<!--            <weights>0,0,0,100,0,0,0</weights>-->
+<!--        </work>-->
+<!--        <work>-->
+<!--            <warmup>10</warmup>-->
+<!--            <time>250</time>-->
+<!--            <rate>90</rate>-->
+<!--            <weights>0,0,0,100,0,0,0</weights>-->
+<!--        </work>-->
+<!--        <work>-->
+<!--            <warmup>10</warmup>-->
+<!--            <time>250</time>-->
+<!--            <rate>100</rate>-->
+<!--            <weights>0,0,0,100,0,0,0</weights>-->
+<!--        </work>-->
     </works>
 
     <!-- YCSB Procedures declaration -->

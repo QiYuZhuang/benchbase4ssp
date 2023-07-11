@@ -125,6 +125,11 @@ public class DBWorkload {
             wrkld.setRandomSeed(xmlConfig.getInt("randomSeed", -1));
             wrkld.setBatchSize(xmlConfig.getInt("batchsize", 128));
             wrkld.setMaxRetries(xmlConfig.getInt("retries", 3));
+            wrkld.setZipfain(xmlConfig.getDouble("zipf", 0.6));
+            wrkld.setWrTup(xmlConfig.getDouble("wrtuple", 0.5));
+            wrkld.setWrTxn(xmlConfig.getDouble("wrtxn", 0.5));
+            wrkld.setDisRatio(xmlConfig.getDouble("disRatio", 0.5));
+            wrkld.setNodeCnt(xmlConfig.getInt("nodeCnt", 2));
             wrkld.setNewConnectionPerTxn(xmlConfig.getBoolean("newConnectionPerTxn", false));
 
             int terminals = xmlConfig.getInt("terminals[not(@bench)]", 0);

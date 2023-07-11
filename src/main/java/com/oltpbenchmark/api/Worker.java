@@ -423,7 +423,9 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                         LOG.debug(String.format("%s %s committing...", this, transactionType));
                     }
 
+//                    long startTime = System.currentTimeMillis();
                     conn.commit();
+//                    System.out.println("commit time: " + (System.currentTimeMillis() - startTime) + " ms");
 
                     break;
 

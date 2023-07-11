@@ -41,7 +41,7 @@ import java.util.Random;
  * The algorithm used here is from "Quickly Generating Billion-Record Synthetic Databases", Jim Gray et al, SIGMOD 1994.
  */
 public class ZipfianGenerator extends IntegerGenerator {
-    public static final double ZIPFIAN_CONSTANT = 0.1;
+    public static final double ZIPFIAN_CONSTANT = 0.6;
 
     private static final Logger LOG = LoggerFactory.getLogger(ZipfianGenerator.class);
 

@@ -45,9 +45,18 @@ public class UpdateRecord extends Procedure {
 
         Statement stmt = conn.createStatement();
         try {
+            long startTime = System.currentTimeMillis();
             stmt.execute(final_stmt.toString());
+            Thread.sleep(0);
+//            System.out.println("update execute time: " + (System.currentTimeMillis() - startTime) + " ms; sql: " + final_stmt);
+            System.out.println("update execute time: " + (System.currentTimeMillis() - startTime) + " ms;");
         } catch (SQLException ex) {
-            System.out.println(ex.toString());
+            System.out.println("error sql: " + final_stmt);
+            throw ex;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            stmt.close();
         }
     }
 }
